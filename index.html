@@ -1,104 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WASI SMS BOOMBER</title>
-  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>HACKER WASI AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      padding: 0;
-      font-family: 'Luckiest Guy', cursive;
-      background: #111;
-      color: white;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #00ffcc;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-    }
-
-    .corner-image {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 3px solid white;
-      object-fit: cover;
+      justify-content: start;
+      height: 100vh;
+      padding: 40px 20px;
     }
 
     h1 {
       font-size: 2.5rem;
-      margin-top: 100px;
+      text-shadow: 0 0 20px #00ffcc;
+      margin-bottom: 20px;
     }
 
-    input {
+    .chat-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #00ffcc44;
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+    }
+
+    input[type="text"] {
+      width: 100%;
       padding: 12px;
-      font-size: 18px;
-      margin: 20px 0;
-      border-radius: 10px;
       border: none;
-      width: 250px;
-      text-align: center;
+      border-radius: 10px;
+      background-color: #121212;
+      color: #00ffcc;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 15px;
     }
 
     button {
-      margin: 10px;
-      padding: 14px 28px;
-      font-size: 16px;
+      padding: 10px 20px;
+      background-color: #00ffcc;
+      color: #000;
       border: none;
       border-radius: 8px;
-      background-color: #ff007f;
-      color: white;
       cursor: pointer;
-      transition: 0.3s;
+      font-weight: bold;
+      transition: background 0.3s;
     }
 
     button:hover {
-      background-color: #e60073;
+      background-color: #00e6b8;
     }
 
-    .footer-buttons {
-      margin-top: 40px;
+    .response {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      white-space: pre-wrap;
+      background: #101010;
+      padding: 15px;
+      border-radius: 10px;
+      min-height: 60px;
+      border-left: 4px solid #00ffcc;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
     }
   </style>
 </head>
 <body>
-
-  <!-- Circular image in the corner -->
-  <img src="https://i.postimg.cc/BnckgRqN/IMG-20240927-WA0235.jpg" alt="Profile" class="corner-image">
-  <!-- Replace above link with your image -->
-
-  <h1>WASI SMS BOOMBER</h1>
-
-  <input type="text" id="phoneNumber" placeholder="Enter phone number">
-  <br>
-  <button onclick="startBomber()">START BOMBER</button>
-
-  <div class="footer-buttons">
-    <button onclick="window.open('https://wasismmpannel.online', '_blank')">SMM PANEL</button>
-    <button onclick="window.open('https://youtube.com/@awaishaidermunara', '_blank')">YouTube Channel</button>
-    <button onclick="window.open('https://t.me/aloneboywasi', '_blank')">Telegram</button>
+  <h1>HACKER WASI AI</h1>
+  <div class="chat-box">
+    <input type="text" id="userInput" placeholder="Ask something...">
+    <button onclick="fetchReply()">ASK</button>
+    <div id="response" class="response">AI reply will appear here...</div>
   </div>
 
   <script>
-    function startBomber() {
-      const number = document.getElementById('phoneNumber').value;
-      if (number === "") {
-        alert("Please enter a phone number!");
+    async function fetchReply() {
+      const input = document.getElementById('userInput').value.trim();
+      const responseBox = document.getElementById('response');
+
+      if (!input) {
+        responseBox.innerText = "Please enter something to ask.";
         return;
       }
 
-      fetch(`https://shadowtools.site/smsbomberapi/smsbomber.php?number=${number}&amount=100`)
-        .then(res => res.text())
-        .then(data => alert("API Triggered!\n" + data))
-        .catch(err => alert("Error: " + err));
+      responseBox.innerText = "Thinking... 🤖";
+
+      try {
+        const res = await fetch(`https://shadowtools.site/shadowapi/shadowchatbot.php?text=${encodeURIComponent(input)}`);
+        const text = await res.text();
+        responseBox.innerText = text;
+      } catch (err) {
+        responseBox.innerText = "❌ Failed to connect to API.";
+        console.error(err);
+      }
     }
   </script>
-
 </body>
 </html>
