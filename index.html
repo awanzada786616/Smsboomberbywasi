@@ -106,7 +106,7 @@
       responseBox.innerText = "Thinking... 🤖";
 
       try {
-        const res = await fetch(`https://shadowtools.site/shadowapi/shadowchatbot.php?text=${encodeURIComponent(input)}`);
+        const res = await fetch(`https://shadowscriptz.xyz/shadowapisv4/chatbot_api.php?prompt=How%20ae%20you${encodeURIComponent(input)}`);
         const text = await res.text();
         responseBox.innerText = text;
       } catch (err) {
