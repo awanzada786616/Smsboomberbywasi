@@ -2,177 +2,132 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WASI AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>WASI AI CHAT</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f9ff, #e6f0fa);
       display: flex;
       flex-direction: column;
-      align-items: center;
       height: 100vh;
-      padding: 20px;
     }
 
-    h1 {
-      margin: 20px 0;
-      font-size: 2.2rem;
-      font-weight: 600;
-      background: linear-gradient(90deg, #1976d2, #388e3c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 1px;
+    header {
+      background: #1f7aed;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    .chat-box {
+    #chat-container {
       flex: 1;
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 16px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      width: 100%;
-      max-width: 700px;
+      padding: 15px;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      padding: 20px;
-    }
-
-    .chat-history {
-      flex: 1;
-      overflow-y: auto;
-      margin-bottom: 15px;
-      padding-right: 8px;
+      gap: 12px;
     }
 
     .message {
-      margin: 10px 0;
+      max-width: 75%;
       padding: 12px 16px;
-      border-radius: 12px;
-      max-width: 80%;
+      border-radius: 15px;
       line-height: 1.5;
-      animation: fadeIn 0.3s ease-in-out;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 15px;
     }
 
     .user {
-      background: #1976d2;
-      color: #fff;
       align-self: flex-end;
+      background: #1f7aed;
+      color: white;
+      border-bottom-right-radius: 5px;
     }
 
     .bot {
-      background: #f1f8e9;
-      border: 1px solid #c5e1a5;
-      color: #2e7d32;
       align-self: flex-start;
+      background: #e6f5e9;
+      color: #1a1a1a;
+      border-bottom-left-radius: 5px;
     }
 
-    .input-area {
+    #input-area {
       display: flex;
-      gap: 10px;
+      padding: 12px;
+      background: #fff;
+      border-top: 1px solid #ddd;
     }
 
-    input[type="text"] {
+    #userInput {
       flex: 1;
-      padding: 14px;
+      padding: 10px;
       border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 15px;
+      border-radius: 25px;
       outline: none;
-      transition: 0.2s;
-    }
-
-    input[type="text"]:focus {
-      border-color: #1976d2;
-      box-shadow: 0 0 5px #90caf9;
+      font-size: 15px;
     }
 
     button {
-      padding: 12px 20px;
-      background: linear-gradient(90deg, #1976d2, #388e3c);
-      color: #fff;
+      margin-left: 10px;
+      padding: 10px 18px;
       border: none;
-      border-radius: 10px;
+      border-radius: 25px;
+      background: #1f7aed;
+      color: white;
+      font-size: 15px;
       cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
+      transition: 0.2s;
     }
 
     button:hover {
-      opacity: 0.9;
-      transform: scale(1.03);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
+      background: #145bcc;
     }
   </style>
 </head>
 <body>
-  <h1>🤖 WASI AI CHAT</h1>
-  <div class="chat-box">
-    <div id="chatHistory" class="chat-history"></div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type your message...">
-      <button onclick="fetchReply()">Send</button>
-    </div>
+  <header>🤖 WASI AI CHAT</header>
+  <div id="chat-container"></div>
+
+  <div id="input-area">
+    <input type="text" id="userInput" placeholder="Type your message..." />
+    <button onclick="fetchReply()">Send</button>
   </div>
 
   <script>
-    const chatHistory = document.getElementById("chatHistory");
+    const chatContainer = document.getElementById("chat-container");
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.className = "message " + sender;
+      div.innerText = text;
+      chatContainer.appendChild(div);
+      chatContainer.scrollTop = chatContainer.scrollHeight; // auto-scroll
+    }
 
     async function fetchReply() {
-      const inputEl = document.getElementById("userInput");
-      const userText = inputEl.value.trim();
+      const input = document.getElementById("userInput");
+      const userText = input.value.trim();
       if (!userText) return;
 
-      // Show user message
       addMessage(userText, "user");
-      inputEl.value = "";
-
-      // Thinking placeholder
-      const thinkingEl = addMessage("Thinking...", "bot");
+      input.value = "";
 
       try {
-        const res = await fetch(
-          `https://shadowscriptz.xyz/shadowapisv4/chatbot_api.php?prompt=${encodeURIComponent(userText)}`
-        );
+        const res = await fetch(`https://shadowscriptz.xyz/shadowapisv4/chatbot_api.php?prompt=${encodeURIComponent(userText)}`);
         const data = await res.json();
+        let reply = data.reply || "⚠️ No reply received.";
 
-        let text = data.reply || "⚠️ No reply received.";
-
-        // Replace placeholder with typing effect
-        thinkingEl.innerText = "";
-        typeWriter(thinkingEl, text);
-
+        addMessage(reply, "bot");
       } catch (err) {
-        thinkingEl.innerText = "❌ Failed to connect to API.";
-        console.error(err);
+        addMessage("❌ Failed to connect to API.", "bot");
       }
-    }
-
-    function addMessage(text, type) {
-      const div = document.createElement("div");
-      div.className = `message ${type}`;
-      div.innerText = text;
-      chatHistory.appendChild(div);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-      return div;
-    }
-
-    function typeWriter(element, text) {
-      let i = 0;
-      function typing() {
-        if (i < text.length) {
-          element.innerText += text.charAt(i);
-          i++;
-          setTimeout(typing, 25);
-        }
-      }
-      typing();
     }
   </script>
 </body>
