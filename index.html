@@ -20,68 +20,83 @@
     }
 
     h1 {
-      font-size: 2.5rem;
-      text-shadow: 0 0 20px #00ffcc;
-      margin-bottom: 20px;
+      font-size: 2.8rem;
+      text-shadow: 0 0 25px #00ffcc, 0 0 40px #007f66;
+      margin-bottom: 25px;
+      letter-spacing: 2px;
     }
 
     .chat-box {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid #00ffcc44;
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 20px;
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 25px;
       width: 100%;
-      max-width: 600px;
-      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+      max-width: 650px;
+      box-shadow: 0 0 25px rgba(0, 255, 204, 0.25);
+      transition: 0.3s ease-in-out;
+    }
+
+    .chat-box:hover {
+      box-shadow: 0 0 35px rgba(0, 255, 204, 0.4);
     }
 
     input[type="text"] {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       background-color: #121212;
       color: #00ffcc;
       font-size: 16px;
       outline: none;
-      margin-bottom: 15px;
+      margin-bottom: 18px;
+      transition: 0.2s;
+    }
+
+    input[type="text"]:focus {
+      box-shadow: 0 0 10px #00ffcc66;
     }
 
     button {
-      padding: 10px 20px;
+      padding: 12px 25px;
       background-color: #00ffcc;
       color: #000;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       font-weight: bold;
-      transition: background 0.3s;
+      transition: 0.3s;
+      font-size: 16px;
     }
 
     button:hover {
       background-color: #00e6b8;
+      transform: scale(1.05);
     }
 
     .response {
-      margin-top: 20px;
-      font-size: 1.1rem;
+      margin-top: 22px;
+      font-size: 1.15rem;
       white-space: pre-wrap;
       background: #101010;
-      padding: 15px;
-      border-radius: 10px;
+      padding: 18px;
+      border-radius: 12px;
       min-height: 60px;
       border-left: 4px solid #00ffcc;
       animation: fadeIn 0.3s ease-in-out;
+      line-height: 1.5;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 600px) {
-      h1 { font-size: 2rem; }
+      h1 { font-size: 2.2rem; }
+      .chat-box { padding: 18px; }
     }
   </style>
 </head>
@@ -99,16 +114,32 @@
       const responseBox = document.getElementById('response');
 
       if (!input) {
-        responseBox.innerText = "Please enter something to ask.";
+        responseBox.innerText = "⚠️ Please enter something to ask.";
         return;
       }
 
       responseBox.innerText = "Thinking... 🤖";
 
       try {
-        const res = await fetch(`https://shadowscriptz.xyz/shadowapisv4/chatbot_api.php?prompt=How%20ae%20you${encodeURIComponent(input)}`);
-        const text = await res.text();
-        responseBox.innerText = text;
+        const res = await fetch(`https://shadowscriptz.xyz/shadowapisv4/chatbot_api.php?prompt=${encodeURIComponent(input)}`);
+        let text = await res.text();
+
+        // Remove unwanted words/credits
+        const unwanted = [
+          "developed by shadow",
+          "powered by",
+          "created by",
+          "credits to",
+          "shadowapisv4"
+        ];
+        unwanted.forEach(word => {
+          const regex = new RegExp(word, "gi");
+          text = text.replace(regex, "");
+        });
+
+        text = text.trim();
+
+        responseBox.innerText = text || "⚠️ No meaningful reply received.";
       } catch (err) {
         responseBox.innerText = "❌ Failed to connect to API.";
         console.error(err);
